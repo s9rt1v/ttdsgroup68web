@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <!-- 引入 jQuery -->
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<!-- 引入 typeahead.js -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.11.1/typeahead.bundle.min.js"></script>
+
+    <title>{% block title %}Movie Search Engine{% endblock title %}</title>
+
+    {% load static %}
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.css'%}">
+	<link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css' >
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300,700' rel='stylesheet' type='text/css'>
+    <link rel='stylesheet' href='{% static "css/base.css" %}' />
+
+    <!-- 加载Glyphicons字体文件 -->
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.4.1/fonts/glyphicons-halflings-regular.woff2" rel="stylesheet">
+
+
+
+    <style type="text/css">
+        element.style{
+            line-height: 0;
+            background-color:black  ;
+        }
+        .thumbnail p, .thumbnail h4 {
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            }
+        .star-rating {
+            line-height:32px;
+            font-size:1.25em;
+            margin-left:-33px;
+            }
+        .star-rating .fa-star{
+        color: #F1C40F;
+        }
+        .heart-rating {
+            line-height:32px;
+            font-size:1.25em;
+            margin-left:-33px;
+            }
+        .heart-rating .fa-heart{
+        color:#F1C40F;
+        }
+        .button {
+          background-color: #F1C40F;
+          border: none;
+          color: white;
+          padding: 10px 32px;
+          text-align: center;
+          text-decoration: none;
+          display: inline-block;
+          font-size: 16px;
+          margin: 4px 4px;
+          cursor: pointer;
+          margin-left:45px;
+        }
+        .button1 {
+          background-color: #F1C40F;
+            border-radius: 4px;
+          border: none;
+          color: white;
+          padding: 12px 30px;
+          text-align: center;
+          text-decoration: none;
+          display: inline-block;
+          font-size: 16px;
+          margin: -4px -4px;
+          cursor: pointer;
+          margin-left:4px;
+        }
+
+        ._list_box{
+            padding:0 10%;
+            box-sizing: border-box;
+
+        }
+        ._list_news{
+            margin-left: 30px;     box-sizing: border-box;
+            width: 80%;
+        }
+        ._list_title{
+            margin: 0;
+            font-size: 26px;
+            margin-bottom: 20px;
+        }
+        ._list_con{
+            display: flex;
+            margin-bottom: 50px;
+            border: #999 1px solid;
+            border-radius: 5px;
+            padding: 15px;
+        }
+
+        ._list_img{
+            box-sizing: border-box;
+            width: 15%;
+        }
+        ._list_img img{
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        ._list_tag_2{
+            margin-left: 20px;
+        }
+
+
+
+        .line{
+            color:#46b8da;
+   text-overflow: -o-ellipsis-lastline;
+   overflow: hidden;
+   text-overflow: ellipsis;
+   display: -webkit-box;
+   -webkit-line-clamp: 12;
+   line-clamp: 12;
+   -webkit-box-orient: vertical;
+}
+.style{
+  width: 100%;
+}
+
+        </style>
+</head>
+
+
+
+<body style="background-color:black">
+	<nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <div class="collapse navbar-collapse" id="topNavBar">
+
+                <ul class="nav navbar-nav ">
+                    <li><a style="color:#F1C40F" href="/">Movie Search Engine</a></li>
+                </ul>
+                <ul class="nav navbar-nav ">
+                    <li><a href="{% url 'index' %}"> Home</a></li>
+                </ul>
+
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="{% url 'watch' %}">
+                            <span aria-hidden="true"></span>MyList
+                        </a>
+                    </li>
+                 {% if not request.user.is_authenticated %}
+                    <li>
+                        <a href="{% url 'signup' %}">
+                            <span aria-hidden="true"></span>SignUp
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'login' %}">
+                            <span aria-hidden="true"></span>Login
+                        </a>
+                    </li>
+                {% else %}
+                    <li>
+                        <a href="{% url 'logout' %}">
+                            <span aria-hidden="true"></span>&nbsp;Logout
+                        </a>
+                    </li>
+                {% endif %}
+                </ul>
+
+            </div>
+        </div>
+    </nav>
+</div>
+    {% block body %}
+    {% endblock %}
+     <nav class="navbar navbar-bottom">
+    </nav>
+	<script type="text/javascript" src="{%static 'js/jquery.min.js'%}">
+	</script>
+
+	<script type="text/javascript" src="{%static 'js/bootstrap.min.js'%}">
+	</script>
+    <script type="text/javascript">
+        let genre="";
+        let year="";
+
+        // 网页跳转
+        let cur_url=window.location.href;
+        let cur_url_protocol=window.location.protocol;
+        //获取当前url的传入参数
+        if(cur_url.includes('genre')){
+            genre=cur_url.split(/[=&]/)[1];
+            if(cur_url.includes('year')){
+                year = cur_url.split('=')[2];
+            }
+        }
+        else if(cur_url.includes('year')){
+            year = cur_url.split('=')[1];
+        }
+        console.log(genre);
+        console.log(year);
+
+        const genreArr= document.getElementsByClassName('genre');
+        for(let i =0;i<genreArr.length;i++){
+            genreArr[i].addEventListener('click',function (){
+                genre=genreArr[i].innerText;
+                if(cur_url.includes('year')){
+                    cur_url=cur_url_protocol+'?genre='+genre+"&year="+year;
+                }
+                else {
+                    cur_url=cur_url_protocol+'?genre='+genre;
+                }
+                location.href = cur_url;
+            });
+        }
+
+        const yearArr= document.getElementsByClassName('year');
+        for(let i =0;i<yearArr.length;i++){
+            yearArr[i].addEventListener('click',function (){
+                year=yearArr[i].innerText;
+                if(cur_url.includes('genre')){
+                    cur_url=cur_url_protocol+'?genre='+genre+"&year="+year;
+                }
+                else {
+                    cur_url=cur_url_protocol+'?year='+year;
+                }
+                location.href = cur_url;
+            });
+        }
+        if(year.length!=0){
+            let year_query='.y'+year+'.year';
+            const yearEl= document.querySelectorAll(year_query)[0];
+            console.log(yearEl);
+            yearEl.classList.add('active');
+        }
+        else{
+            const yearEl= document.querySelectorAll('.year.yAll')[0];
+            yearEl.classList.add('active');
+        }
+
+        if(genre.length!=0){
+            let genre_query='.'+genre+'.genre';
+            const genreEl= document.querySelectorAll(genre_query)[0];
+            console.log(genreEl);
+            genreEl.classList.add('active');
+        }
+        else{
+            const genreEl= document.querySelectorAll('.genre.All')[0];
+            genreEl.classList.add('active');
+        }
+
+
+
+
+
+
+
+    var $star_rating = $('.star-rating .fa');
+
+    var SetRatingStar = function() {
+        return $star_rating.each(function() {
+        if (parseInt($star_rating.siblings('input.rating-value').val()) >= parseInt($(this).data('rating'))) {
+            return $(this).removeClass('fa-star-o').addClass('fa-star');
+        } else {
+        return $(this).removeClass('fa-star').addClass('fa-star-o');
+        }
+        });
+        };
+
+    $star_rating.on('click', function() {
+    $star_rating.siblings('input.rating-value').val($(this).data('rating'));
+    return SetRatingStar();
+    });
+
+    SetRatingStar();
+    $(document).ready(function() {
+
+    });
+
+</script>
+<script type="text/javascript">
+    function validateForm(){
+    var x = document.forms["ratingForm"]["rating"].value;
+    if(x=="0"){
+        alert("Invalid Input");
+        return false;
+    }
+    }
+</script>
+{% block js %}{% endblock %}
+
+
+</body>
+</html>

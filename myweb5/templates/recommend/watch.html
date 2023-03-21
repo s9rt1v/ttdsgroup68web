@@ -1,0 +1,53 @@
+{% extends 'recommend/base.html'%}
+{% block body %}
+
+<h3>My List</h3>
+<hr>
+<br>
+<!-- Movie list -->
+<div class="row">
+    {% if movies %}
+    {% for movie in movies %}
+        <div class="col-sm-2 col-md-2 ">
+            <div class="thumbnail">
+                <h4>{{movie.title}}</h4>
+                <a href="{% url 'detail' movie.id %}">
+                    <img src="{{ movie.poster_path}}" class="img-responsive" style="border-radius: 22px 22px 22px 22px; width: 200px; height: 250px; object-fit: cover;">
+                </a>
+                <h5>{{movie.genre}}</h5>
+            </div>
+        </div>
+    {% endfor %}
+    {% else %}
+        <div class="alert alert-danger">
+            <strong>Sorry!</strong> No movies in your list.
+        </div>
+    {% endif %}
+</div>
+
+    <br>
+<h3>Guess you like:</h3>
+    <hr>
+    <br>
+    <div class="row">
+    {% if recommend %}
+    {% for movie in recommend %}
+        <div class="col-sm-2 col-md-2 ">
+            <div class="thumbnail">
+                <h4>{{movie.title}}</h4>
+                <a href="{% url 'detail' movie.id %}">
+                    <img src="{{ movie.poster_path}}" class="img-responsive" style="border-radius: 22px 22px 22px 22px; width: 200px; height: 250px; object-fit: cover;">
+                </a>
+                <h5>{{movie.genre}}</h5>
+            </div>
+        </div>
+    {% endfor %}
+    {% else %}
+        <div class="alert alert-danger">
+            <strong>Sorry!</strong> No movies in your list.
+        </div>
+    {% endif %}
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,179 @@
+{% extends 'recommend/base.html'%}
+{% block body %}
+
+
+<div class="container" >
+    <div class="col-xs-6 col-xs-offset-3">
+    	<form class="form-horizontal" role="search" method="get" action="{% url 'list' %}">
+            <div class="form-group">
+                <div class="input-group">
+                    <span>use deep learning search
+                        <input type="checkbox" value="deeplearning" name="watch">
+                    </span>
+                    <input type="text" class="form-control input-lg " id="search-input" name="q" value="{{ request.GET.q }}" placeholder= "Search Movies "/>
+                    <div class="dropdown">
+                            <ul id="suggestions" class="dropdown-menu"></ul>
+                    </div>
+                    <span class='input-group-btn'>
+                        <button class='button1' type='submit'>Search</button>
+                    </span>
+                </div>
+
+            </div>
+        </form>
+    </div>
+ </div>
+
+
+{#<p style="text-align:left;">#}
+{#    <span style="float:right;">#}
+{#        <a href="{% url 'recommend' %}" class="btn"><button style="color:#fff;background-color:#4CAF50;padding:10px">Get Movie Recommendation</button></a>#}
+{#    <h2>Movie List</h2>#}
+{#    </span>#}
+{#</p>#}
+{#<hr>#}
+{#<br>#}
+<!-- Movie list -->
+    <div class="_list_box" >
+        <!-- <div class="row" > -->
+                <div>
+
+                     <h2 class="_list_title"><font  color="#fffaf0"></font></h2>
+                 <h2 class="_list_title"><font  color="#fffaf0">Time usd in search: {{time_consume }}s</font></h2>
+                </div>
+            {% if movies %}
+            {% for movie in movies %}
+
+                <div>
+                <a href="{% url 'detail' movie.id %}">
+                     <h2 class="_list_title"><font  color="#fffaf0"></font></h2>
+                 <h2 class="_list_title"><font  color="#fffaf0">{{movie.title }}</font></h2>
+                    </a>
+                </div>
+
+                <div >
+                    <div class="_list_con" style="display: flex;border-radius: 20px 20px 20px 20px">
+                         <a class="_list_img" href="{% url 'detail' movie.id %}">
+                            <img src="{{ movie.poster_path}}" class="img-responsive" style=" border-radius: 22px 22px 22px 22px;text-align:left">
+                        </a>
+                        <div class="_list_news">
+                            <h5><font size="5" color="#dc143c">Genres: {{movie.genres}}</font></h5>
+                            <h5 class="_list_tag"><font size="5" color="#7fffd4">Actor: {{movie.credits}}</font><font class="_list_tag_2" size="5" color="#7fffd4">Time: {{movie.release_date}}</font></h5>
+                            <!-- <div class="_list_p">000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000</div> -->
+                            <div class="line style"><font size="4" color="#d3d3d3">Overview:{{movie.overview}}
+                            </font></div>
+                            <!-- <h5><font class="_list_p" size="2" color="#7fffd4">Overview: {{movie.genres}}312312312313123123123123123123123131312312312313123123123123123123123131312312312313123123123123123123123131312312312313123123123123123123123131312312312313123123123123123123123131312312312313123123123123123123123131</font></h5> -->
+                        </div>
+                       
+                </div>
+                {% endfor %}
+                <nav aria-label="Page navigation" style=" text-align: center; ">
+                  <ul class="pagination">
+                    <li {% if not has_previous %}class="disabled"{% endif %}>
+                      <a {% if has_previous %}href="/list/?q={{ q }}&num={{ num }}&page={{ pindex|add:-1}}"{% endif %} aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                      </a>
+                    </li>
+                  {% for page_num in page_range %}
+                      {% if page_num == pindex %}
+                         <li class="active" ><a style="cursor: pointer;">{{ page_num }}</a></li>
+                      {% else %}
+                        {% if page_num == '...' %}
+                            <li><a style="cursor: pointer;">{{ page_num }}</a></li>
+                        {% else %}
+                            <li><a href="/list/?q={{ q }}&num={{ num }}&page={{ page_num }}">{{ page_num }}</a></li>
+                        {% endif %}
+                      {% endif %}
+                  {% endfor %}
+                  <li {% if not has_next %}class="disabled"{% endif %}>
+                      <a {% if has_next %}href="/list/?q={{ q }}&num={{ num }}&page={{ pindex|add:1}}"{% endif %} aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                      </a>
+                    </li>
+                <div class="page-num">
+                <form action="/list/?q={{ q }}" method="get">
+                    <select class="form-control" name="num" id="pagenum">
+                      <option value="3" {% if num == 3 %}selected{% endif %}><a href="/list/?q={{ q }}&num=3">3 movies/page</a></option>
+                      <option value="5" {% if num == 5 %}selected{% endif %}>5 movies/page</option>
+                      <option value="10" {% if num == 10 %}selected{% endif %}>10 movies/page</option>
+                      <option value="15" {% if num == 15 %}selected{% endif %}>15 movies/page</option>
+                    </select>
+                </form>
+                </div>
+                  </ul>
+                </nav>
+                {% endif %}
+        </div>
+
+</div>
+
+    <style>
+    .page-num{
+            width: 100px;
+        display: inline-block;
+    }
+    .page-num .form-control{
+        height: 46px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    }
+    .pagination>li:last-child>a, .pagination>li:last-child>span {
+    border-top-right-radius: 0!important;
+    border-bottom-right-radius: 0!important;
+    }
+    </style>
+
+{% endblock %}
+
+{% block js %}
+    <script>
+    $('#pagenum').change(function(){
+      var data= $('#pagenum').val();
+      window.location.href = "/list/?q={{ q }}&num="+data;
+    });
+     const searchInput = document.getElementById('search-input');
+     const suggestions = document.getElementById('suggestions');
+
+window.onload = function() {
+  // 添加输入事件监听器
+  searchInput.addEventListener('input', function() {
+    const searchTerm = searchInput.value.trim().toLowerCase();
+    if (searchTerm.length > 0) {
+      const xhr = new XMLHttpRequest();
+      xhr.onreadystatechange = function() {
+        if (this.readyState === 4 && this.status === 200) {
+          const response = this.responseText;
+          const suggestionsList = JSON.parse(response); // 解析JSON格式的response
+          let output = '';
+          let count = 0;
+          suggestionsList.forEach(function(suggestion) {
+            if (count < 10 && suggestion.toLowerCase().startsWith(searchTerm)) {
+              output += '<li><a href="#">' + suggestion + '</a></li>';
+              count++;
+            }
+          });
+          suggestions.innerHTML = output;
+
+          // 为下拉菜单项添加点击事件监听器
+          const dropdownItems = suggestions.querySelectorAll('li');
+          dropdownItems.forEach(function(item) {
+            item.addEventListener('click', function() {
+              searchInput.value = item.textContent;
+              suggestions.innerHTML = '';
+            });
+          });
+        } else if (this.readyState === 4 && this.status !== 200) {
+          suggestions.innerHTML = '请求失败，请检查文本文件路径是否正确';
+        }
+      };
+      xhr.open('GET', '/static/txt/title.txt', true);
+      xhr.send();
+    } else {
+      suggestions.innerHTML = '';
+    }
+  });
+};
+
+
+    </script>
+{% endblock %}
